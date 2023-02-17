@@ -42,7 +42,7 @@ class CgroupV2ContainerIdExtractor {
       return empty();
     }
     try {
-      return filesystem
+      Optional<String> containerID = filesystem
           .lines(V2_CGROUP_PATH)
           .filter(line -> line.contains("hostname"))
           .flatMap(line -> Stream.of(line.split("/")))
@@ -50,6 +50,8 @@ class CgroupV2ContainerIdExtractor {
           .filter(Matcher::matches)
           .findFirst()
           .map(matcher -> matcher.group(0));
+      logger.log(Level.INFO, "ContainerID from CGroupV2:", containerID);
+      return containerID;
     } catch (IOException e) {
       logger.log(Level.WARNING, "Unable to read v2 cgroup path", e);
     }
