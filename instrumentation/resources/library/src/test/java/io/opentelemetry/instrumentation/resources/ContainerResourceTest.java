@@ -21,13 +21,24 @@ import org.mockito.junit.jupiter.MockitoExtension;
 class ContainerResourceTest {
 
   public static final String TEST_CONTAINER_ID = "abcdef123123deadbeef";
+  @Mock EcsContainerIdExtractor ecs;
   @Mock CgroupV1ContainerIdExtractor v1;
   @Mock CgroupV2ContainerIdExtractor v2;
 
   @Test
+  void ecsSuccess() {
+    when(ecs.extractContainerId()).thenReturn(Optional.of(TEST_CONTAINER_ID));
+    ContainerResource containerResource = new ContainerResource(ecs, v1, v2);
+    Resource resource = containerResource.buildResource();
+    assertThat(resource.getAttribute(CONTAINER_ID)).isEqualTo(TEST_CONTAINER_ID);
+    verifyNoInteractions(v1, v2);
+  }
+
+  @Test
   void v1Success() {
+    when(ecs.extractContainerId()).thenReturn(Optional.empty());
     when(v1.extractContainerId()).thenReturn(Optional.of(TEST_CONTAINER_ID));
-    ContainerResource containerResource = new ContainerResource(v1, v2);
+    ContainerResource containerResource = new ContainerResource(ecs, v1, v2);
     Resource resource = containerResource.buildResource();
     assertThat(resource.getAttribute(CONTAINER_ID)).isEqualTo(TEST_CONTAINER_ID);
     verifyNoInteractions(v2);
@@ -35,9 +46,10 @@ class ContainerResourceTest {
 
   @Test
   void v2Success() {
+    when(ecs.extractContainerId()).thenReturn(Optional.empty());
     when(v1.extractContainerId()).thenReturn(Optional.empty());
     when(v2.extractContainerId()).thenReturn(Optional.of(TEST_CONTAINER_ID));
-    ContainerResource containerResource = new ContainerResource(v1, v2);
+    ContainerResource containerResource = new ContainerResource(ecs, v1, v2);
     Resource resource = containerResource.buildResource();
     assertThat(resource.getAttribute(CONTAINER_ID)).isEqualTo(TEST_CONTAINER_ID);
   }
@@ -46,7 +58,7 @@ class ContainerResourceTest {
   void bothVersionsFail() {
     when(v1.extractContainerId()).thenReturn(Optional.empty());
     when(v2.extractContainerId()).thenReturn(Optional.empty());
-    ContainerResource containerResource = new ContainerResource(v1, v2);
+    ContainerResource containerResource = new ContainerResource(ecs, v1, v2);
     Resource resource = containerResource.buildResource();
     assertThat(resource).isSameAs(Resource.empty());
   }

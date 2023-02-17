@@ -16,6 +16,7 @@ public final class VersionLogger {
 
   public static void logAllVersions() {
     logger.log(INFO, "opentelemetry-javaagent - version: {0}", AgentVersion.VERSION);
+    logger.log(INFO, "Custom Build:Author - Biswajit Nanda");
     if (logger.isLoggable(FINE)) {
       logger.log(
           FINE,

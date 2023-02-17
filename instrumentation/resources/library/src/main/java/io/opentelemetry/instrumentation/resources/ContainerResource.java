@@ -18,7 +18,7 @@ import java.util.stream.Stream;
 
 /**
  * Factory for {@link Resource} retrieving Container ID information. It supports both cgroup v1 and
- * v2 runtimes.
+ * v2 runtimes as well as Amazon ECS Fargate and ECS EC2 Containers.
  */
 public final class ContainerResource {
 
@@ -30,16 +30,18 @@ public final class ContainerResource {
     return new ContainerResource().buildResource();
   }
 
+  private final EcsContainerIdExtractor ecsExtractor;
   private final CgroupV1ContainerIdExtractor v1Extractor;
   private final CgroupV2ContainerIdExtractor v2Extractor;
 
   private ContainerResource() {
-    this(new CgroupV1ContainerIdExtractor(), new CgroupV2ContainerIdExtractor());
+    this(new EcsContainerIdExtractor(), new CgroupV1ContainerIdExtractor(), new CgroupV2ContainerIdExtractor());
   }
 
   // Visible for testing
   ContainerResource(
-      CgroupV1ContainerIdExtractor v1Extractor, CgroupV2ContainerIdExtractor v2Extractor) {
+      EcsContainerIdExtractor ecsExtractor, CgroupV1ContainerIdExtractor v1Extractor, CgroupV2ContainerIdExtractor v2Extractor) {
+    this.ecsExtractor = ecsExtractor;
     this.v1Extractor = v1Extractor;
     this.v2Extractor = v2Extractor;
   }
@@ -52,11 +54,19 @@ public final class ContainerResource {
   }
 
   private Optional<String> getContainerId() {
+    Optional<String> ecsResult = ecsExtractor.extractContainerId();
     Optional<String> v1Result = v1Extractor.extractContainerId();
-    if (v1Result.isPresent()) {
+    Optional<String> v2Result = v2Extractor.extractContainerId();
+
+    if (ecsResult.isPresent()) {
+      return ecsResult;
+    }
+    else if (v1Result.isPresent()) {
       return v1Result;
     }
-    return v2Extractor.extractContainerId();
+    else {
+      return v2Result;
+    }
   }
 
   /** Returns resource with container information. */
