@@ -57,15 +57,15 @@ public final class ContainerResource {
     Optional<String> v2Result = v2Extractor.extractContainerId();
 
     if (ecsResult.isPresent()) {
-      System.out.println("ContainerID Otel Resource Attribute set to:" + ecsResult);
+      System.out.println("ContainerID Otel Resource Attribute set to: " + ecsResult);
       return ecsResult;
     }
     else if (v1Result.isPresent()) {
-      System.out.println("ContainerID Otel Resource Attribute set to:" + v1Result);
+      System.out.println("ContainerID Otel Resource Attribute set to: " + v1Result);
       return v1Result;
     }
     else {
-      System.out.println("ContainerID Otel Resource Attribute set to:" + v2Result);
+      System.out.println("ContainerID Otel Resource Attribute set to: " + v2Result);
       return v2Result;
     }
   }
