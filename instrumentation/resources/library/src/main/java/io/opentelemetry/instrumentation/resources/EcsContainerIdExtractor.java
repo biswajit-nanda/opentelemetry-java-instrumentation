@@ -45,7 +45,7 @@ public class EcsContainerIdExtractor {
           .filter(Matcher::matches)
           .findFirst()
           .map(matcher -> matcher.group(0));
-      logger.log(Level.INFO, "ContainerID from ECS:" + containerID);
+      logger.log(Level.INFO, "ContainerID from ECS: " + containerID);
       return containerID;
     } catch (IOException e) {
       logger.log(Level.WARNING, "Unable to read ECS cgroup path", e);

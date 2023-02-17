@@ -25,8 +25,6 @@ import java.util.stream.Stream;
 public final class ContainerResource {
   static final Filesystem FILESYSTEM_INSTANCE = new Filesystem();
   private static final Resource INSTANCE = buildSingleton();
-  private static final Logger logger =
-      Logger.getLogger(ContainerResource.class.getName());
   private static Resource buildSingleton() {
     // can't initialize this statically without running afoul of animalSniffer on paths
     return new ContainerResource().buildResource();
@@ -61,15 +59,15 @@ public final class ContainerResource {
     Optional<String> v2Result = v2Extractor.extractContainerId();
 
     if (ecsResult.isPresent()) {
-      logger.log(Level.INFO, "ContainerID Otel Resource Attribute set to:" + ecsResult);
+      System.out.println("ContainerID Otel Resource Attribute set to:" + ecsResult);
       return ecsResult;
     }
     else if (v1Result.isPresent()) {
-      logger.log(Level.INFO, "ContainerID Otel Resource Attribute set to:" + v1Result);
+      System.out.println("ContainerID Otel Resource Attribute set to:" + v1Result);
       return v1Result;
     }
     else {
-      logger.log(Level.INFO, "ContainerID Otel Resource Attribute set to:" + v2Result);
+      System.out.println("ContainerID Otel Resource Attribute set to:" + v2Result);
       return v2Result;
     }
   }
