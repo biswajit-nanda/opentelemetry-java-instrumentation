@@ -14,6 +14,8 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Optional;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import java.util.stream.Stream;
 
 /**
@@ -21,10 +23,10 @@ import java.util.stream.Stream;
  * v2 runtimes as well as Amazon ECS Fargate and ECS EC2 Containers.
  */
 public final class ContainerResource {
-
   static final Filesystem FILESYSTEM_INSTANCE = new Filesystem();
   private static final Resource INSTANCE = buildSingleton();
-
+  private static final Logger logger =
+      Logger.getLogger(ContainerResource.class.getName());
   private static Resource buildSingleton() {
     // can't initialize this statically without running afoul of animalSniffer on paths
     return new ContainerResource().buildResource();
@@ -59,12 +61,15 @@ public final class ContainerResource {
     Optional<String> v2Result = v2Extractor.extractContainerId();
 
     if (ecsResult.isPresent()) {
+      logger.log(Level.INFO, "ContainerID Otel Resource Attribute set to:" + ecsResult);
       return ecsResult;
     }
     else if (v1Result.isPresent()) {
+      logger.log(Level.INFO, "ContainerID Otel Resource Attribute set to:" + v1Result);
       return v1Result;
     }
     else {
+      logger.log(Level.INFO, "ContainerID Otel Resource Attribute set to:" + v2Result);
       return v2Result;
     }
   }

@@ -88,8 +88,7 @@ final class CgroupV1ContainerIdExtractor {
 
     if (OtelEncodingUtils.isValidBase16String(containerId) && !containerId.isEmpty()) {
       Optional<String> containerID = Optional.of(containerId);
-      //logger.log(Level.INFO, "ContainerID from CGroupV1:", containerID);
-      System.out.println("ContainerID from CGroupV1: " + containerID);
+      logger.log(Level.INFO, "ContainerID from CGroupV1:" + containerID);
       return containerID;
     } else {
       return Optional.empty();
